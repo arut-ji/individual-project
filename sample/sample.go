@@ -3,6 +3,7 @@ package sample
 import (
 	"context"
 	"github.com/google/go-github/v32/github"
+	"github.com/jinzhu/gorm"
 	"golang.org/x/oauth2"
 	"os"
 )
@@ -22,6 +23,7 @@ type Sampler interface {
 
 type sampler struct {
 	ghc *github.Client
+	db  *gorm.DB
 }
 
 func NewCodeSampler(ctx context.Context) Sampler {

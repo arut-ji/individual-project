@@ -55,10 +55,12 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 		}()
 		mux.Lock()
 		samples = append(samples, Sample{
-			FileName:   file.GetName(),
-			Path:       file.GetPath(),
-			Repository: file.GetRepository().GetFullName(),
-			Content:    <-cch,
+			FileName:     file.GetName(),
+			Path:         file.GetPath(),
+			Repository:   file.GetRepository().GetFullName(),
+			RepositoryId: file.GetRepository().GetID(),
+			Fork:         file.GetRepository().GetFork(),
+			Content:      <-cch,
 		})
 		mux.Unlock()
 	}
