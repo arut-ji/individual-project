@@ -11,13 +11,6 @@ import (
 
 func main() {
 	ctx := context.Background()
-	sampler := sample.NewCodeSampler(ctx)
-	samples, err := sampler.NewSampleFromAPI(ctx, &sample.SamplingOptions{
-		Size: 500,
-	})
-	if err != nil {
-		_ = fmt.Errorf("%v", err)
-	}
 
 	db, err := database.NewDatabase()
 	if err != nil {
@@ -25,17 +18,20 @@ func main() {
 		panic(err)
 	}
 
+	sampler := sample.NewCodeSampler(ctx)
+	samples, err := sampler.NewSampleFromAPI(ctx, &sample.SamplingOptions{
+		Size: 1000,
+	})
+	if err != nil {
+		_ = fmt.Errorf("%v", err)
+	}
+
 	var wg sync.WaitGroup
 	for _, s := range *samples {
-		s := s
-		go func() {
-			wg.Add(1)
-			//log.Println("Saving: ", s)
-			err := db.Create(&s).Error
-			if err != nil {
-				log.Fatalln("Error creating a sample: ", err)
-			}
-		}()
+		err := db.Create(&s).Error
+		if err != nil {
+			log.Fatalln("Error creating a sample: ", err)
+		}
 	}
 	wg.Wait()
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-github/v32/github"
 	"github.com/reactivex/rxgo/v2"
 	"log"
+	"time"
 )
 
 const (
@@ -18,21 +19,13 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// TODO: Implement a mechanism to use pagination feature when the sample size >= 50
-
 	sch := s.createSource(ctx)
-
-	var currentSampleSize int32 = 0
 
 	ob := rxgo.
 		FromChannel(sch, rxgo.WithPublishStrategy()).
 		Map(mapToContent(s), rxgo.WithCPUPool()).
-		Filter(isScriptValid).
-		TakeWhile(func(_ interface{}) bool {
-			// FIXME: This is quite ugly...
-			currentSampleSize += 1
-			return currentSampleSize < opts.Size
-		})
+		Map(mapWithLintingResult).
+		Take(uint(opts.Size))
 
 	ob.Connect(ctx)
 
@@ -40,6 +33,7 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 
 	for item := range ob.Observe() {
 		sample := item.V.(Sample)
+		log.Println("Getting a file from: ", sample.RepositoryId)
 		samples = append(samples, sample)
 	}
 
@@ -49,26 +43,30 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 func (s *sampler) createSource(ctx context.Context) <-chan rxgo.Item {
 
 	ch := make(chan rxgo.Item)
+
+	perPage := 100
+
 	go func(och chan rxgo.Item) {
-		for page := 0; ; page++ {
+		for page := 0; perPage*page <= 1000; page++ {
 			log.Printf("Fetching %v page ...", page)
 			result, _, err := s.ghc.Search.Code(
 				ctx,
 				KubernetesQueryString,
 				&github.SearchOptions{
 					ListOptions: github.ListOptions{
-						PerPage: 50,
+						PerPage: perPage,
 						Page:    page,
 					},
 				})
 			if err != nil {
 				log.Println("Error fetching codes: ", err)
-				break
+				return
 			}
 
 			for _, codeResult := range result.CodeResults {
 				och <- rxgo.Of(codeResult)
 			}
+			time.Sleep(time.Second * 1)
 		}
 	}(ch)
 	return ch
@@ -111,7 +109,19 @@ func mapToContent(s *sampler) rxgo.Func {
 	}
 }
 
-func isScriptValid(item interface{}) bool {
+func mapWithLintingResult(_ context.Context, item interface{}) (interface{}, error) {
 	sample := item.(Sample)
-	return linter.IsKubernetesScriptValid(sample.Content)
+	lintingResult, err := linter.IsKubernetesScriptValid(sample.Content)
+	if err != nil {
+		return nil, err
+	}
+	return Sample{
+		FileName:      sample.FileName,
+		Path:          sample.Path,
+		Repository:    sample.Repository,
+		RepositoryId:  sample.RepositoryId,
+		Fork:          false,
+		LintingResult: lintingResult,
+		Content:       sample.Content,
+	}, nil
 }
