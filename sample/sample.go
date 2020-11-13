@@ -18,7 +18,7 @@ type Samples []Sample
 
 type Sampler interface {
 	NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (*Samples, error)
-	NewSampleFromCache(ctx context.Context, opts *SamplingOptions) (*Samples, error)
+	NewSampleFromDB(ctx context.Context, opts *SamplingOptions) (*Samples, error)
 }
 
 type sampler struct {
