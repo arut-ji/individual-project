@@ -31,10 +31,16 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 
 	samples := make(Samples, 0)
 
+	var err error = nil
+
 	for item := range ob.Observe() {
 		sample := item.V.(Sample)
 		log.Println("Getting a file from: ", sample.RepositoryId)
 		samples = append(samples, sample)
+		err = s.save(&sample)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &samples, nil
@@ -124,4 +130,8 @@ func mapWithLintingResult(_ context.Context, item interface{}) (interface{}, err
 		LintingResult: lintingResult,
 		Content:       sample.Content,
 	}, nil
+}
+
+func (s *sampler) fetchCommitCounts(ctx context.Context) {
+
 }
