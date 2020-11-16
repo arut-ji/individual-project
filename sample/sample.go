@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"golang.org/x/oauth2"
 	"os"
+	"sync"
 )
 
 type SamplingOptions struct {
@@ -24,14 +25,16 @@ type Sampler interface {
 type sampler struct {
 	ghc *github.Client
 	db  *gorm.DB
+	mu  *sync.Mutex
 }
 
-func NewCodeSampler(ctx context.Context) Sampler {
+func NewCodeSampler(ctx context.Context, db *gorm.DB) Sampler {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 	return &sampler{
 		ghc: github.NewClient(tc),
+		db:  db,
 	}
 }
