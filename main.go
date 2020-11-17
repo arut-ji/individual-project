@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/arut-ji/individual-project/database"
 	"github.com/arut-ji/individual-project/sample"
-	"log"
+	"io/ioutil"
 )
 
 func main() {
@@ -27,8 +28,16 @@ func main() {
 	samples, err := sampler.NewSampleFromDB(ctx, &sample.SamplingOptions{
 		Size: 10,
 	})
+
 	if err != nil {
 		_ = fmt.Errorf("%v", err)
+	}
+	jsonEncodedSamples, _ := json.MarshalIndent(samples, "", " ")
+
+	err = ioutil.WriteFile("www/samples/samples.json", jsonEncodedSamples, 0644)
+
+	if err != nil {
+		panic(err)
 	}
 
 }
