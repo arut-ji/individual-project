@@ -1,6 +1,8 @@
 package sample
 
-import "context"
+import (
+	"context"
+)
 
 func (s *sampler) NewSampleFromDB(ctx context.Context, opts *SamplingOptions) (*Samples, error) {
 	ctx, cancel := context.WithCancel(ctx)
@@ -9,12 +11,12 @@ func (s *sampler) NewSampleFromDB(ctx context.Context, opts *SamplingOptions) (*
 	samples := make(Samples, 0)
 	limit := opts.Size
 	err := s.db.
-		Find(&samples, Sample{LintingResult: true}).
-		Limit(limit).
+		Find(&samples).
 		Error
 	if err != nil {
 		return nil, err
 	}
+	samples = samples[:limit]
 	return &samples, nil
 
 }
