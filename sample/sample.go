@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/google/go-github/v32/github"
 	"github.com/jinzhu/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/oauth2"
 	"os"
 	"sync"
@@ -26,9 +27,10 @@ type sampler struct {
 	ghc *github.Client
 	db  *gorm.DB
 	mu  *sync.Mutex
+	mc  *mongo.Client
 }
 
-func NewCodeSampler(ctx context.Context, db *gorm.DB) Sampler {
+func NewCodeSampler(ctx context.Context, db *gorm.DB, mc *mongo.Client) Sampler {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
 	)
@@ -36,5 +38,6 @@ func NewCodeSampler(ctx context.Context, db *gorm.DB) Sampler {
 	return &sampler{
 		ghc: github.NewClient(tc),
 		db:  db,
+		mc:  mc,
 	}
 }

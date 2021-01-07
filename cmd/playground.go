@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"github.com/arut-ji/individual-project/database"
-	"github.com/arut-ji/individual-project/linter"
-	"github.com/arut-ji/individual-project/sample"
-	"github.com/arut-ji/individual-project/util"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"time"
+
 	"github.com/spf13/cobra"
-	"log"
-	"os"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewPlaygroundCmd(ctx context.Context) *cobra.Command {
@@ -18,47 +17,48 @@ func NewPlaygroundCmd(ctx context.Context) *cobra.Command {
 		Short: "Execute code implemented in scratch pad.",
 		Long:  "Execute code implemented in scratch pad.",
 		Run: func(cmd *cobra.Command, args []string) {
-			playground(ctx)
+			mongoPlayground(ctx)
 		},
 	}
 }
 
-func playground(ctx context.Context) {
-	db, err := database.NewDatabase()
+func mongoPlayground(ctx context.Context) {
+	// Create Mongo Client
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
-		_ = fmt.Errorf("%v", err)
 		panic(err)
 	}
-	log.Println("Creating a new sampler ...")
-	sampler := sample.NewCodeSampler(ctx, db)
-	samples, err := sampler.NewSampleFromDB(ctx, &sample.SamplingOptions{
-		Size: 500,
-	})
-
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	// Connect Mongo Client to a Mongo instance
+	err = client.Connect(ctx)
 	if err != nil {
-		_ = fmt.Errorf("%v", err)
+		panic(err)
+	}
+	// Deferred connection closing
+	defer func() {
+		if err = client.Disconnect(ctx); err != nil {
+			panic(err)
+		}
+	}()
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		panic(err)
+	}
+	err = insertItem(ctx, client)
+	if err != nil {
+		panic(err)
 	}
 
-	log.Println("Decoding contents ...")
+}
 
-	for _, s := range *samples {
-		content, err := util.DecodeContent(s.Content)
-		if err != nil {
-			os.Exit(1)
-		}
-		results, err := linter.Lint(content)
-
-		numErrors := 0
-
-		for _, result := range results {
-			//fmt.Printf("Resource kind: %v\n", result.Kind)
-			numErrors += len(result.Errors)
-		}
-		if numErrors != 0 {
-			fmt.Printf("Filename: %v\n", s.FileName)
-			fmt.Printf("Path: %v\n", s.Path)
-			fmt.Println("Repository name: " + s.Repository)
-			fmt.Printf("Number of errors: %d\n\n", numErrors)
-		}
+func insertItem(ctx context.Context, client *mongo.Client) error {
+	collection := client.Database("testing").Collection("numbers")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := collection.InsertOne(ctx, bson.M{"name": "pi", "value": 3.14159})
+	if err != nil {
+		return err
 	}
+	return nil
 }
