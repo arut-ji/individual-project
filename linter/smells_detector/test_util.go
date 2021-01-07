@@ -7,7 +7,7 @@ import (
 
 type loadFixtureFunc func(string) string
 
-func loadFixture(fixtureDir string) loadFixtureFunc {
+func LoadFixture(fixtureDir string) loadFixtureFunc {
 	return func(filename string) string {
 		content, err := ioutil.ReadFile(fmt.Sprintf("%v/%v", fixtureDir, filename))
 		if err != nil {
