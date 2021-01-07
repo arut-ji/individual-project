@@ -6,6 +6,10 @@ const (
 	CharactersPerLine = 100
 )
 
+func Scan(script string) (bool, error) {
+	return hasLongStatement(script)
+}
+
 /*
 	Associated with Long Statement smells
 	- The script may contain one or more very long statement.

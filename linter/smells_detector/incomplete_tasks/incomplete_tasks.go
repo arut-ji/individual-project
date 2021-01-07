@@ -2,7 +2,7 @@ package incomplete_tasks
 
 import "regexp"
 
-func HasInCompleteTasks(script string) (bool, error) {
+func Scan(script string) (bool, error) {
 	return hasInCompleteTasks(script)
 }
 
