@@ -1,4 +1,4 @@
-package smells_detector
+package avoid_comments
 
 import "regexp"
 
