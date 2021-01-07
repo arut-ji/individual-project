@@ -3,10 +3,10 @@ package incomplete_tasks
 import "regexp"
 
 func HasInCompleteTasks(script string) (bool, error) {
-	return inCompleteTasks(script)
+	return hasInCompleteTasks(script)
 }
 
-func inCompleteTasks(script string) (bool, error) {
+func hasInCompleteTasks(script string) (bool, error) {
 	match, err := regexp.MatchString("#.*(FIXME|TODO):.*", script)
 	if err != nil {
 		return false, err
