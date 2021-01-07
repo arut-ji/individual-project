@@ -1,0 +1,15 @@
+# FIXME: Inconsistent naming in services.
+# prefix with some strings FIXME: Meow
+# prefix with some strings TODO: add something
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-staging-config
+  namespace: staging
+data:
+  auth-service: staging.auth-service.svc.cluster.local
+  PAYMENT_SERVICE: staging.payment-service.svc.cluster.local
+
+# FIXME: Meow Meow Meow
+# Normal Comment
+# TODO: Add more configmaps

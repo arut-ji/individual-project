@@ -1,4 +1,4 @@
-package smells_detector
+package incomplete_tasks
 
 import "regexp"
 
