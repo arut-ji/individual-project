@@ -2,7 +2,7 @@ package avoid_comments
 
 import "regexp"
 
-func HasComments(script string) (bool, error) {
+func Scan(script string) (bool, error) {
 	return hasComments(script)
 }
 
