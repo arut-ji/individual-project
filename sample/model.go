@@ -9,4 +9,5 @@ type CodeContent struct {
 	LintingResult bool   `json:"lintingResult,omitempty" bson:"lintingResult,omitempty"`
 	Content       string `json:"content,omitempty" bson:"content,omitempty"`
 	CommitCount   int64  `json:"commitCount,omitempty" bson:"commitCount,omitempty"`
+	Owner         string `json:"owner,omitempty" bson:"owner,omitempty"`
 }
