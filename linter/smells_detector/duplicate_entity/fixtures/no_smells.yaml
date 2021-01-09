@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service-staging
+  namespace: ambassador
+  labels:
+    app: gateway-service-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service-staging
+  template:
+    metadata:
+      labels:
+        app: gateway-service-staging
+    spec:
+      terminationGracePeriodSeconds: 5
+      volumes:
+        - name: google-cloud-key
+          secret:
+            secretName: service-account-credentials
+      containers:
+        - name: gateway-service-staging
+          image: gcr.io/payment-service-282010/gateway-staging:latest
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: google-cloud-key
+              mountPath: /var/secrets/google
+          env:
+            - name: APP_DEBUG
+              value: "true"
+            - name: APP_ENV
+              value: "staging"
+            - name: APP_RESTSERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-staging-config
+                  key: APP_RESTSERVER_ADDRESS
+            - name: APP_AUTHSERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-staging-config
+                  key: APP_AUTHSERVER_ADDRESS
+            - name: APP_AUTHSERVER_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-staging-config
+                  key: APP_AUTHSERVER_SECRET
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/key.json
