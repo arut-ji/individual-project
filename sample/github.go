@@ -6,6 +6,7 @@ import (
 	"github.com/arut-ji/individual-project/linter"
 	"github.com/google/go-github/v32/github"
 	"github.com/reactivex/rxgo/v2"
+	"golang.org/x/oauth2"
 	"log"
 	"time"
 )
@@ -41,6 +42,14 @@ func (s *sampler) NewSampleFromAPI(ctx context.Context, opts *SamplingOptions) (
 	}
 
 	return &samples, nil
+}
+
+func NewGithubClient(ctx context.Context, token string) *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	return github.NewClient(tc)
 }
 
 // This function returns an observable emitting query results from Github API.
@@ -144,7 +153,7 @@ func mapWithLintingResult(_ context.Context, item interface{}) (interface{}, err
 	}, nil
 }
 
-func fetchCommitCount(ctx context.Context, ghc *github.Client, owner, repo string) (int, error) {
+func FetchCommitCount(ctx context.Context, ghc *github.Client, owner, repo string) (int, error) {
 	commits, _, err := ghc.Repositories.ListCommits(ctx, owner, repo, nil)
 	if err != nil {
 		return 1, err
