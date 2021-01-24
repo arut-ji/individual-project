@@ -1,127 +1,71 @@
 package main
 
 import (
-	"context"
-	"github.com/arut-ji/individual-project/database"
-	"github.com/arut-ji/individual-project/linter/smells_detector"
-	"github.com/arut-ji/individual-project/sample"
-	"github.com/arut-ji/individual-project/util"
-	"github.com/jinzhu/gorm"
-	"github.com/reactivex/rxgo/v2"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"time"
+	"github.com/davecgh/go-spew/spew"
+	"gopkg.in/yaml.v2"
 )
 
+const file = `apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+  labels:
+    app: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: k8s.gcr.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    livenessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 20
+`
+
+func getReadinessProbe(container interface{}) map[interface{}]interface{} {
+	probe := container.(map[interface{}]interface{})["readinessProbe"]
+	if probe == nil {
+		return nil
+	}
+	return probe.(map[interface{}]interface{})
+}
+
+func getLivenessProbe(container interface{}) map[interface{}]interface{} {
+	probe := container.(map[interface{}]interface{})["livenessProbe"]
+	if probe == nil {
+		return nil
+	}
+	return probe.(map[interface{}]interface{})
+}
+
+func getContainers(manifest map[interface{}]interface{}) []interface{} {
+	var result []interface{}
+	for key, value := range manifest {
+		switch value.(type) {
+		case map[interface{}]interface{}:
+			result = getContainers(value.(map[interface{}]interface{}))
+		case []interface{}:
+			if key.(string) == "containers" {
+				result = value.([]interface{})
+			}
+		}
+	}
+	return result
+}
+
 func main() {
-	ctx := context.Background()
-	mClient, mClose, err := database.NewMongoClient(ctx, "mongodb://localhost:27017")
+	t := make(map[interface{}]interface{}, 1)
+	err := yaml.Unmarshal([]byte(file), &t)
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		err := mClose()
-		if err != nil {
-			panic(err)
-		}
-	}()
-
-	// Create a mongo DB data sink.
-	mongoResultSink := createMongoSink(mClient, "detections")
-	// Pull kubernetes scripts from a mongo's collection named "samples"
-	<-createMongoSource(ctx, mClient, "samples").
-		Take(5).
-		Map(decodeContent). // Decode base64 content into string
-		Map(
-			detectImplementationSmells, // Feed each content to smells detection pipeline
-			rxgo.WithPool(4),
-		).
-		Map(mongoResultSink). // Save the result into a mongo's collection named "detections"
-		Run()
-}
-
-func sampleFromSqlite() rxgo.Observable {
-	ch := make(chan rxgo.Item)
-	go func(ch chan rxgo.Item) {
-		db, err := gorm.Open("sqlite3", "samples.db")
-		if err != nil {
-			ch <- rxgo.Error(err)
-		}
-		db.AutoMigrate(&database.Sample{})
-		ghrp := sample.NewRepository(db)
-		samples, err := ghrp.GetAll()
-		if err != nil {
-			ch <- rxgo.Error(err)
-		}
-		for _, s := range *samples {
-			ch <- rxgo.Item{
-				V: s,
-			}
-		}
-		close(ch)
-	}(ch)
-	return rxgo.FromEventSource(ch, rxgo.WithPublishStrategy())
-}
-
-func loadScriptsFromSqlite(db *gorm.DB) (*sample.Samples, error) {
-	results := make(sample.Samples, 0)
-	err := db.Find(&results).Error
-	if err != nil {
-		return nil, err
-	}
-	return &results, nil
-}
-
-func decodeContent(_ context.Context, i interface{}) (interface{}, error) {
-	s := i.(sample.Sample)
-	content, err := util.DecodeContent(s.Content)
-	if err != nil {
-		return nil, err
-	}
-	return string(content), nil
-}
-
-func detectImplementationSmells(_ context.Context, i interface{}) (interface{}, error) {
-	detectionResult, err := smells_detector.Detect(i.(string))
-	if err != nil {
-		return nil, err
-	}
-	return detectionResult, nil
-}
-
-func createMongoSource(ctx context.Context, client *mongo.Client, collectionName string) rxgo.Observable {
-	ch := make(chan rxgo.Item)
-	collection := client.Database("kubernetes").Collection(collectionName)
-	go loadScriptFromMongo(ctx, collection, ch)
-	return rxgo.FromChannel(ch)
-}
-
-func loadScriptFromMongo(ctx context.Context, collection *mongo.Collection, ch chan rxgo.Item) {
-	cursor, err := collection.Find(ctx, bson.D{})
-	if err != nil {
-		ch <- rxgo.Error(err)
-	}
-	for cursor.Next(ctx) {
-		var item sample.Sample
-		if err := cursor.Decode(&item); err != nil {
-			ch <- rxgo.Error(err)
-		}
-		ch <- rxgo.Of(item)
-	}
-	if err = cursor.Close(ctx); err != nil {
-		ch <- rxgo.Error(err)
-	}
-	close(ch)
-}
-
-func createMongoSink(client *mongo.Client, collectionName string) rxgo.Func {
-
-	collection := client.Database("kubernetes").Collection(collectionName)
-
-	return func(ctx context.Context, item interface{}) (interface{}, error) {
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-		s := item.(smells_detector.DetectionResult)
-		return collection.InsertOne(ctx, s)
+	containers := getContainers(t)
+	for _, container := range containers {
+		livenessProbe := getLivenessProbe(container)
+		readinessProbe := getReadinessProbe(container)
+		spew.Dump(livenessProbe)
+		spew.Dump(readinessProbe)
 	}
 }
