@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/davecgh/go-spew/spew"
+	"fmt"
+	"github.com/arut-ji/individual-project/util"
 	"gopkg.in/yaml.v2"
+	"reflect"
 )
 
 const file = `apiVersion: v1
@@ -21,6 +23,11 @@ spec:
       tcpSocket:
         port: 8080
       initialDelaySeconds: 15
+      periodSeconds: 20
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 1
       periodSeconds: 20
 `
 
@@ -61,11 +68,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	containers := getContainers(t)
+	containers := util.GetContainers(t)
 	for _, container := range containers {
-		livenessProbe := getLivenessProbe(container)
-		readinessProbe := getReadinessProbe(container)
-		spew.Dump(livenessProbe)
-		spew.Dump(readinessProbe)
+		livenessProbe := util.GetLivenessProbe(container)
+		readinessProbe := util.GetReadinessProbe(container)
+		fmt.Println(reflect.DeepEqual(readinessProbe, livenessProbe))
 	}
 }

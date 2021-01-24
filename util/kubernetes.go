@@ -5,7 +5,7 @@ func GetContainers(manifest map[interface{}]interface{}) []interface{} {
 	for key, value := range manifest {
 		switch value.(type) {
 		case map[interface{}]interface{}:
-			result = getContainers(value.(map[interface{}]interface{}))
+			result = GetContainers(value.(map[interface{}]interface{}))
 		case []interface{}:
 			if key.(string) == "containers" {
 				result = value.([]interface{})
