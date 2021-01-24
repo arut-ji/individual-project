@@ -1,8 +1,8 @@
 apiVersion: v1
-  kind: ConfigMap
-  metadata:
+kind: ConfigMap
+metadata:
     name: gateway-staging-config
     namespace: staging
-  data:
+data:
     auth-service: staging.auth-service.svc.cluster.local
     PAYMENT_SERVICE: staging.payment-service.svc.cluster.local

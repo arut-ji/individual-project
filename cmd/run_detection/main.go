@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+type DetectionResult struct {
+	Content string `json:"content,omitempty" bson:"content,omitempty"`
+}
+
 func main() {
 	ctx := context.Background()
 	mClient, mClose, err := database.NewMongoClient(ctx, "mongodb://localhost:27017")
@@ -33,7 +37,6 @@ func main() {
 		Map(decodeContent). // Decode base64 content into string
 		Map(
 			detectImplementationSmells, // Feed each content to smells detection pipeline
-			rxgo.WithPool(4),
 		).
 		Map(mongoResultSink). // Save the result into a mongo's collection named "detections"
 		Run()
