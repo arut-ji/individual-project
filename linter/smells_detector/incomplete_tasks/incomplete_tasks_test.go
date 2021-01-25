@@ -1,12 +1,12 @@
 package incomplete_tasks
 
 import (
-	"github.com/arut-ji/individual-project/linter/smells_detector"
+	"github.com/arut-ji/individual-project/util"
 	"testing"
 )
 
 func loadFixture(name string) string {
-	return smells_detector.LoadFixture("./fixtures")(name)
+	return util.LoadFixture("./fixtures")(name)
 }
 
 func TestInCompleteTasks(t *testing.T) {

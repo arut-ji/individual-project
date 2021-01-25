@@ -1,4 +1,4 @@
-package smells_detector
+package util
 
 import (
 	"fmt"
