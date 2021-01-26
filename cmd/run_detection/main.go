@@ -6,15 +6,18 @@ import (
 	"github.com/arut-ji/individual-project/linter/smells_detector"
 	"github.com/arut-ji/individual-project/sample"
 	"github.com/arut-ji/individual-project/util"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/reactivex/rxgo/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
-type DetectionResult struct {
-	Content string `json:"content,omitempty" bson:"content,omitempty"`
+type DetectionRecord struct {
+	FileName        string                          `json:"fileName,omitempty" bson:"fileName,omitempty"`
+	Path            string                          `json:"path,omitempty" bson:"path,omitempty"`
+	RepositoryId    int64                           `json:"repositoryId,omitempty" bson:"repositoryId,omitempty"`
+	DetectionResult smells_detector.DetectionResult `json:"detectionResult,omitempty" bson:"detectionResult, omitempty"`
 }
 
 func main() {
@@ -34,13 +37,14 @@ func main() {
 	mongoResultSink := createMongoSink(mClient, "detections")
 	// Pull kubernetes scripts from a mongo's collection named "samples"
 	<-createMongoSource(ctx, mClient, "samples").
-		Take(5).
 		Map(decodeContent). // Decode base64 content into string
 		Map(
 			detectImplementationSmells, // Feed each content to smells detection pipeline
 		).
 		Map(mongoResultSink). // Save the result into a mongo's collection named "detections"
-		Run()
+		DoOnError(func(err error) {
+			panic(err)
+		})
 }
 
 func decodeContent(_ context.Context, i interface{}) (interface{}, error) {
@@ -49,15 +53,22 @@ func decodeContent(_ context.Context, i interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return string(content), nil
+	s.Content = string(content)
+	return s, nil
 }
 
 func detectImplementationSmells(_ context.Context, i interface{}) (interface{}, error) {
-	detectionResult, err := smells_detector.Detect(i.(string))
+	s := i.(sample.Sample)
+	detectionResult, err := smells_detector.Detect(s.Content)
 	if err != nil {
 		return nil, err
 	}
-	return detectionResult, nil
+	return DetectionRecord{
+		FileName:        s.FileName,
+		Path:            s.Path,
+		RepositoryId:    s.RepositoryId,
+		DetectionResult: detectionResult,
+	}, nil
 }
 
 func createMongoSource(ctx context.Context, client *mongo.Client, collectionName string) rxgo.Observable {
@@ -92,8 +103,24 @@ func createMongoSink(client *mongo.Client, collectionName string) rxgo.Func {
 	return func(ctx context.Context, item interface{}) (interface{}, error) {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		s := item.(smells_detector.DetectionResult)
-		spew.Dump(s)
-		return collection.InsertOne(ctx, s)
+		s := item.(DetectionRecord)
+		opts := options.FindOneAndUpdate().SetUpsert(true)
+		filter := bson.D{
+			{"fileName", s.FileName},
+			{"path", s.Path},
+			{"repositoryId", s.RepositoryId},
+		}
+		update := bson.D{
+			{"$set", bson.D{{"detectionResult", s.DetectionResult}}},
+		}
+		var updatedDocument bson.M
+		err := collection.FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedDocument)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return updatedDocument, nil
+			}
+			return nil, err
+		}
+		return updatedDocument, nil
 	}
 }
