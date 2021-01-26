@@ -6,6 +6,7 @@ import (
 	"github.com/arut-ji/individual-project/linter/smells_detector"
 	"github.com/arut-ji/individual-project/sample"
 	"github.com/arut-ji/individual-project/util"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/reactivex/rxgo/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -92,6 +93,7 @@ func createMongoSink(client *mongo.Client, collectionName string) rxgo.Func {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 		s := item.(smells_detector.DetectionResult)
+		spew.Dump(s)
 		return collection.InsertOne(ctx, s)
 	}
 }
