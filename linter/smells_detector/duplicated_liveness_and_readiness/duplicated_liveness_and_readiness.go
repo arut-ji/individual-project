@@ -2,7 +2,7 @@ package duplicated_liveness_and_readiness
 
 import (
 	"github.com/arut-ji/individual-project/util"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"reflect"
 )
 
