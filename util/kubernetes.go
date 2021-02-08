@@ -26,11 +26,26 @@ func GetContainers(manifest interface{}) []interface{} {
 }
 
 func GetReadinessProbe(container interface{}) map[string]interface{} {
-	probe := container.(map[string]interface{})["readinessProbe"]
-	if probe == nil {
-		return nil
+	result := make(map[string]interface{}, 1)
+	switch container.(type) {
+	case map[string]interface{}:
+		probe := container.(map[string]interface{})["readinessProbe"]
+		if probe == nil {
+			return nil
+		}
+		for k, v := range probe.(map[string]interface{}) {
+			result[k] = v
+		}
+	case map[interface{}]interface{}:
+		probe := container.(map[interface{}]interface{})["readinessProbe"]
+		if probe == nil {
+			return nil
+		}
+		for k, v := range probe.(map[interface{}]interface{}) {
+			result[k.(string)] = v
+		}
 	}
-	return probe.(map[string]interface{})
+	return result
 }
 
 func GetLivenessProbe(container interface{}) map[string]interface{} {
