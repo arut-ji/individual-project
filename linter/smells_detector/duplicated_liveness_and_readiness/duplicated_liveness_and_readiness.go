@@ -22,10 +22,7 @@ func hasDuplicatedLivenessAndReadiness(script string) (bool, error) {
 	for _, container := range containers {
 		livenessProbe := util.GetLivenessProbe(container)
 		readinessProbe := util.GetReadinessProbe(container)
-		if readinessProbe == nil || livenessProbe == nil {
-			return false, nil
-		}
 		result = result || reflect.DeepEqual(readinessProbe, livenessProbe)
 	}
-	return false, nil
+	return result, nil
 }

@@ -2,8 +2,6 @@ package util
 
 import "testing"
 
-type Node map[interface{}]interface{}
-
 func TestGetContainers(t *testing.T) {
 	manifest := map[interface{}]interface{}{
 		"spec": map[interface{}]interface{}{
@@ -30,15 +28,15 @@ func TestGetContainers(t *testing.T) {
 }
 
 func TestGetReadinessProbe(t *testing.T) {
-	manifest := map[interface{}]interface{}{
+	manifest := map[string]interface{}{
 		"name":  "liveness",
 		"image": "k8s.grc.io/busybox",
-		"livenessProbe": map[interface{}]interface{}{
+		"livenessProbe": map[string]interface{}{
 			"exec": map[interface{}]interface{}{
 				"command": []interface{}{"cat", "/tmp/healthy"},
 			},
 		},
-		"readinessProbe": map[interface{}]interface{}{
+		"readinessProbe": map[string]interface{}{
 			"exec": map[interface{}]interface{}{
 				"command": []interface{}{"cat", "/tmp/healthy"},
 			},
@@ -51,15 +49,15 @@ func TestGetReadinessProbe(t *testing.T) {
 }
 
 func TestGetLivenessProbe(t *testing.T) {
-	manifest := map[interface{}]interface{}{
+	manifest := map[string]interface{}{
 		"name":  "liveness",
 		"image": "k8s.grc.io/busybox",
-		"livenessProbe": map[interface{}]interface{}{
+		"livenessProbe": map[string]interface{}{
 			"exec": map[interface{}]interface{}{
 				"command": []interface{}{"cat", "/tmp/healthy"},
 			},
 		},
-		"readinessProbe": map[interface{}]interface{}{
+		"readinessProbe": map[string]interface{}{
 			"exec": map[interface{}]interface{}{
 				"command": []interface{}{"cat", "/tmp/healthy"},
 			},
