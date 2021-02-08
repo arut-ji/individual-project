@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/arut-ji/individual-project/linter/smells_detector/duplicated_liveness_and_readiness"
+	"github.com/arut-ji/individual-project/linter/smells_detector/missing_readiness_probes"
 	"gopkg.in/yaml.v2"
 )
 
@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	result, err := duplicated_liveness_and_readiness.Scan(file)
+	result, err := missing_readiness_probes.Scan(file)
 	if err != nil {
 		panic(err)
 	}
