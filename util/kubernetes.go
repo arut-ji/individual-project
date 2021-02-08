@@ -1,32 +1,42 @@
 package util
 
-func GetContainers(manifest map[interface{}]interface{}) []interface{} {
+func GetContainers(manifest interface{}) []interface{} {
 	var result []interface{}
-	for key, value := range manifest {
-		switch value.(type) {
-		case map[interface{}]interface{}:
-			result = GetContainers(value.(map[interface{}]interface{}))
-		case []interface{}:
+	switch manifest.(type) {
+	case map[interface{}]interface{}:
+		manifest := manifest.(map[interface{}]interface{})
+		for key, value := range manifest {
 			if key.(string) == "containers" {
-				result = value.([]interface{})
+				return value.([]interface{})
+			} else {
+				result = append(result, GetContainers(value)...)
+			}
+		}
+	case map[string]interface{}:
+		manifest := manifest.(map[string]interface{})
+		for key, value := range manifest {
+			if key == "containers" {
+				return value.([]interface{})
+			} else {
+				result = append(result, GetContainers(value)...)
 			}
 		}
 	}
 	return result
 }
 
-func GetReadinessProbe(container interface{}) map[interface{}]interface{} {
-	probe := container.(map[interface{}]interface{})["readinessProbe"]
+func GetReadinessProbe(container interface{}) map[string]interface{} {
+	probe := container.(map[string]interface{})["readinessProbe"]
 	if probe == nil {
 		return nil
 	}
-	return probe.(map[interface{}]interface{})
+	return probe.(map[string]interface{})
 }
 
-func GetLivenessProbe(container interface{}) map[interface{}]interface{} {
-	probe := container.(map[interface{}]interface{})["livenessProbe"]
+func GetLivenessProbe(container interface{}) map[string]interface{} {
+	probe := container.(map[string]interface{})["livenessProbe"]
 	if probe == nil {
 		return nil
 	}
-	return probe.(map[interface{}]interface{})
+	return probe.(map[string]interface{})
 }
