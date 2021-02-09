@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	result, err := missing_readiness_probes.Scan(file)
+	result, err := missing_readiness_probes.GetNumberOfInstances(file)
 	if err != nil {
 		panic(err)
 	}
