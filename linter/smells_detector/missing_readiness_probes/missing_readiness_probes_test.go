@@ -9,22 +9,22 @@ func loadFixture(name string) string {
 	return util.LoadFixture("./fixtures")(name)
 }
 
-func TestForNoSmell(t *testing.T) {
+func TestForNoInstance(t *testing.T) {
 	script := loadFixture("no_smell.yaml")
-	if result, err := hasMissingReadinessProbes(script); result != false {
+	if result, err := countMissingReadinessProbes(script); result != 0 {
 		if err != nil {
 			t.Error("Detection returned errors: ", err)
 		}
-		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, false)
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 0)
 	}
 }
 
-func TestForOneSmell(t *testing.T) {
+func TestForOneInstance(t *testing.T) {
 	script := loadFixture("one_smell.yaml")
-	if result, err := hasMissingReadinessProbes(script); result != true {
+	if result, err := countMissingReadinessProbes(script); result != 1 {
 		if err != nil {
 			t.Error("Detection returned errors: ", err)
 		}
-		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, true)
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 1)
 	}
 }

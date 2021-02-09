@@ -5,21 +5,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func Scan(scripts string) (bool, error) {
-	return hasMissingReadinessProbes(scripts)
+func GetNumberOfInstances(scripts string) (int, error) {
+	return countMissingReadinessProbes(scripts)
 }
 
-func hasMissingReadinessProbes(script string) (bool, error) {
+func countMissingReadinessProbes(script string) (int, error) {
 	t := make(map[interface{}]interface{}, 1)
 	err := yaml.Unmarshal([]byte(script), &t)
 	if err != nil {
 		panic(err)
 	}
 	containers := util.GetContainers(t)
+	count := 0
 	for _, container := range containers {
 		if probe := util.GetReadinessProbe(container); probe == nil {
-			return true, nil
+			count += 1
 		}
 	}
-	return false, nil
+	return count, nil
 }

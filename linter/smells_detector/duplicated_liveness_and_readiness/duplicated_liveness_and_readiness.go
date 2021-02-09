@@ -6,23 +6,25 @@ import (
 	"reflect"
 )
 
-func Scan(script string) (bool, error) {
-	return hasDuplicatedLivenessAndReadiness(script)
+func GetNumberOfInstances(script string) (int, error) {
+	return countSmellInstances(script)
 }
 
-func hasDuplicatedLivenessAndReadiness(script string) (bool, error) {
+func countSmellInstances(script string) (int, error) {
 	t := make(map[interface{}]interface{}, 1)
 	err := yaml.Unmarshal([]byte(script), &t)
 	if err != nil {
-		panic(err)
+		return -1, err
 	}
 	containers := util.GetContainers(t)
 
-	result := false
+	count := 0
 	for _, container := range containers {
 		livenessProbe := util.GetLivenessProbe(container)
 		readinessProbe := util.GetReadinessProbe(container)
-		result = result || reflect.DeepEqual(readinessProbe, livenessProbe)
+		if reflect.DeepEqual(readinessProbe, livenessProbe) {
+			count += 1
+		}
 	}
-	return result, nil
+	return count, nil
 }

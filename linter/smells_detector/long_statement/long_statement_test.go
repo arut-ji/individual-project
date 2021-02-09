@@ -16,7 +16,7 @@ func randSeq(n int) string {
 	return string(b)
 }
 
-func TestForNoInstances(t *testing.T) {
+func TestForNoInstance(t *testing.T) {
 	script := randSeq(10)
 	if result, err := countLongStatement(script); result != 0 {
 		if err != nil {
