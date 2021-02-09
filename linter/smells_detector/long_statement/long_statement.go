@@ -6,8 +6,8 @@ const (
 	CharactersPerLine = 100
 )
 
-func Scan(script string) (bool, error) {
-	return hasLongStatement(script)
+func GetNumberOfInstances(script string) (int, error) {
+	return countLongStatement(script)
 }
 
 /*
@@ -17,12 +17,13 @@ func Scan(script string) (bool, error) {
 	- However, to have such characters per line is very rare.
 */
 
-func hasLongStatement(script string) (bool, error) {
+func countLongStatement(script string) (int, error) {
+	count := 0
 	lines := strings.Split(script, "\n")
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) > CharactersPerLine {
-			return true, nil
+			count += 1
 		}
 	}
-	return false, nil
+	return count, nil
 }

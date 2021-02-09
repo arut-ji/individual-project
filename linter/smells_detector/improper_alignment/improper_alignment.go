@@ -1,20 +1,24 @@
 package improper_alignment
 
-import "github.com/instrumenta/kubeval/kubeval"
+import (
+	"github.com/davecgh/go-spew/spew"
+	"github.com/instrumenta/kubeval/kubeval"
+)
 
-func Scan(script string) (bool, error) {
-	return hasSmell(script)
+func GetNumberOfInstances(script string) (int, error) {
+	return countSmellInstances(script)
 }
 
-func hasSmell(script string) (bool, error) {
+func countSmellInstances(script string) (int, error) {
 	result, err := kubeval.Validate([]byte(script), kubeval.NewDefaultConfig())
 	if err != nil {
-		return false, err
+		spew.Dump(err)
+		return -1, err
 	}
 	for _, v := range result {
 		if len(v.Errors) != 0 {
-			return false, nil
+			return 1, nil
 		}
 	}
-	return true, nil
+	return 0, nil
 }

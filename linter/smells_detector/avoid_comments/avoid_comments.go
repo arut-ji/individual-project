@@ -1,15 +1,25 @@
 package avoid_comments
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
-func Scan(script string) (bool, error) {
-	return hasComments(script)
+func GetNumberOfInstances(script string) (int, error) {
+	return countComments(script)
 }
 
-func hasComments(script string) (bool, error) {
-	match, err := regexp.MatchString("#.*", script)
-	if err != nil {
-		return false, err
+func countComments(script string) (int, error) {
+	lines := strings.Split(script, "\n")
+	count := 0
+	for _, line := range lines {
+		match, err := regexp.MatchString("#.*", line)
+		if err != nil {
+			continue
+		}
+		if match == true {
+			count += 1
+		}
 	}
-	return match, nil
+	return count, nil
 }

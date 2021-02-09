@@ -1,8 +1,19 @@
 apiVersion: v1
-kind: ConfigMap
+kind: ReplicationController
 metadata:
-  name: gateway-staging-config
-  namespace: staging
-data:
-  auth-service: staging.auth-service.svc.cluster.local
- PAYMENT_SERVICE: staging.payment-service.svc.cluster.local
+  name: "bob"
+spec:
+  replicas: asd"
+  selector:
+    app: nginx
+  templates:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80

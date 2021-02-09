@@ -7,4 +7,3 @@ metadata:
 data:
   auth-service: staging.auth-service.svc.cluster.local
   PAYMENT_SERVICE: staging.payment-service.svc.cluster.local
-# TODO: Add more configmaps
