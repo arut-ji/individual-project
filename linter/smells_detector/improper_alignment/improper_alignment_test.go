@@ -11,17 +11,17 @@ func loadFixture(name string) string {
 
 func TestImproperAlignmentWithNoSmell(t *testing.T) {
 	script := loadFixture("no_smell.yaml")
-	if result, err := hasSmell(script); result != true || err != nil {
-		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, true)
+	if result, err := countSmellInstances(script); result != 0 || err != nil {
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 0)
 	}
 }
 
 func TestImproperAlignmentWithInvalidIndentation(t *testing.T) {
 	script := loadFixture("invalid_indentation.yaml")
-	if result, err := hasSmell(script); result != false {
+	if result, err := countSmellInstances(script); result != 1 {
 		if err != nil {
 			t.Error("Detection returned error", err)
 		}
-		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, true)
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 1)
 	}
 }

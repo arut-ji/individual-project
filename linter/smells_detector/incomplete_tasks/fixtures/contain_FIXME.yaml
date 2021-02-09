@@ -1,4 +1,3 @@
-# FIXME: Inconsistent naming in services.
 # prefix with some strings FIXME: Meow
 apiVersion: v1
 kind: ConfigMap

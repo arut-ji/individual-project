@@ -1,15 +1,27 @@
 package incomplete_tasks
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
-func Scan(script string) (bool, error) {
-	return hasInCompleteTasks(script)
+func GetNumberOfInstances(script string) (int, error) {
+	return countInCompleteTasks(script)
 }
 
-func hasInCompleteTasks(script string) (bool, error) {
-	match, err := regexp.MatchString("#.*(FIXME|TODO):.*", script)
-	if err != nil {
-		return false, err
+func countInCompleteTasks(script string) (int, error) {
+	lines := strings.Split(script, "\n")
+	count := 0
+	for _, line := range lines {
+		match, err := regexp.MatchString("#.*(FIXME|TODO):.*", line)
+		if err != nil {
+			continue
+		}
+
+		if match == true {
+			count += 1
+		}
 	}
-	return match, nil
+
+	return count, nil
 }
