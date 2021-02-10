@@ -2,7 +2,9 @@ package smells_detector
 
 import (
 	"github.com/arut-ji/individual-project/linter/smells_detector/avoid_comments"
+	"github.com/arut-ji/individual-project/linter/smells_detector/improper_alignment"
 	"github.com/arut-ji/individual-project/linter/smells_detector/incomplete_tasks"
+	"github.com/arut-ji/individual-project/linter/smells_detector/long_statement"
 )
 
 type (
@@ -14,11 +16,11 @@ type (
 func newDetector() Detectors {
 	return Detectors{
 		"avoid-comments": avoid_comments.GetNumberOfInstances,
-		//"duplicate-liveness-and-readiness-probe": duplicated_liveness_and_readiness.Scan,
-		//"improper-alignment":                     improper_alignment.Scan,
-		"in-complete-tasks": incomplete_tasks.GetNumberOfInstances,
-		//"long-statement":                         long_statement.Scan,
-		//"missing-readiness-probe":                missing_readiness_probes.Scan,
+		//"duplicate-liveness-and-readiness-probe": duplicated_liveness_and_readiness.GetNumberOfInstances,
+		"improper-alignment": improper_alignment.GetNumberOfInstances,
+		"in-complete-tasks":  incomplete_tasks.GetNumberOfInstances,
+		"long-statement":     long_statement.GetNumberOfInstances,
+		//"missing-readiness-probe":                missing_readiness_probes.GetNumberOfInstances,
 	}
 }
 

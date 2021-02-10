@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/arut-ji/individual-project/database"
 	"github.com/arut-ji/individual-project/linter/smells_detector"
 	"github.com/arut-ji/individual-project/sample"
@@ -43,7 +44,7 @@ func main() {
 		).
 		Map(mongoResultSink). // Save the result into a mongo's collection named "detections"
 		DoOnError(func(err error) {
-			panic(err)
+			fmt.Println(err)
 		})
 }
 
