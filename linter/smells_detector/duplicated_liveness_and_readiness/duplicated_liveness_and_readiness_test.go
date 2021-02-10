@@ -20,11 +20,31 @@ func TestForNoInstance(t *testing.T) {
 }
 
 func TestForOneInstance(t *testing.T) {
-	script := loadFixture("duplicated_liveness_and_readiness.yaml")
+	script := loadFixture("one_smell.yaml")
 	if result, err := countSmellInstances(script); result != 1 {
 		if err != nil {
 			t.Error("Detection returned errors: ", err)
 		}
-		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, true)
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 1)
+	}
+}
+
+func TestForTwoInstanceOneResource(t *testing.T) {
+	script := loadFixture("two_smell_one_resource.yaml")
+	if result, err := countSmellInstances(script); result != 2 {
+		if err != nil {
+			t.Error("Detection returned errors: ", err)
+		}
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 2)
+	}
+}
+
+func TestForTwoInstanceTwoResource(t *testing.T) {
+	script := loadFixture("two_smell_two_resources.yaml")
+	if result, err := countSmellInstances(script); result != 2 {
+		if err != nil {
+			t.Error("Detection returned errors: ", err)
+		}
+		t.Errorf("Detection result was incorrect, got: %v, want: %v.", result, 2)
 	}
 }

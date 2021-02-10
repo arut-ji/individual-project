@@ -1,8 +1,9 @@
 package missing_readiness_probes
 
 import (
+	"bytes"
 	"github.com/arut-ji/individual-project/util"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func GetNumberOfInstances(scripts string) (int, error) {
@@ -10,16 +11,15 @@ func GetNumberOfInstances(scripts string) (int, error) {
 }
 
 func countMissingReadinessProbes(script string) (int, error) {
-	t := make(map[interface{}]interface{}, 1)
-	err := yaml.Unmarshal([]byte(script), &t)
-	if err != nil {
-		panic(err)
-	}
-	containers := util.GetContainers(t)
+	dec := yaml.NewDecoder(bytes.NewReader([]byte(script)))
+	var t map[interface{}]interface{}
 	count := 0
-	for _, container := range containers {
-		if probe := util.GetReadinessProbe(container); probe == nil {
-			count += 1
+	for dec.Decode(&t) == nil {
+		containers := util.GetContainers(t)
+		for _, container := range containers {
+			if probe := util.GetReadinessProbe(container); probe == nil {
+				count += 1
+			}
 		}
 	}
 	return count, nil
