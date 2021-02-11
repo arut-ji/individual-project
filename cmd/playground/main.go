@@ -2,43 +2,25 @@ package main
 
 import (
 	"fmt"
-	"github.com/arut-ji/individual-project/linter/smells_detector/missing_readiness_probes"
-	"gopkg.in/yaml.v2"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/instrumenta/kubeval/kubeval"
+	"io/ioutil"
 )
 
-const file = `apiVersion: v1
-kind: Pod
-metadata:
-  name: goproxy
-  labels:
-    app: goproxy
-spec:
-  containers:
-  - name: goproxy
-    image: k8s.gcr.io/goproxy:0.1
-    ports:
-    - containerPort: 8080
-    livenessProbe:
-      tcpSocket:
-        port: 8080
-      initialDelaySeconds: 15
-      periodSeconds: 20
-    readinessProbe:
-      tcpSocket:
-        port: 8080
-      initialDelaySeconds: 14
-      periodSeconds: 20
-`
-
 func main() {
-	t := make(map[interface{}]interface{}, 1)
-	err := yaml.Unmarshal([]byte(file), &t)
+	content, err := ioutil.ReadFile("./cmd/playground/sample.yaml")
 	if err != nil {
 		panic(err)
 	}
-	result, err := missing_readiness_probes.GetNumberOfInstances(file)
+	//t := make(map[interface{}]interface{}, 1)
+	//err = yaml.Unmarshal(content, &t)
+	//if err != nil {
+	//	panic(err)
+	//}
+	result, err := kubeval.Validate(content)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	fmt.Println(result)
+	spew.Dump(result)
+
 }

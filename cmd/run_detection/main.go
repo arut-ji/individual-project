@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"strings"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type DetectionRecord struct {
 	Path            string                          `json:"path,omitempty" bson:"path,omitempty"`
 	RepositoryId    int64                           `json:"repositoryId,omitempty" bson:"repositoryId,omitempty"`
 	DetectionResult smells_detector.DetectionResult `json:"detectionResult,omitempty" bson:"detectionResult, omitempty"`
+	LineOfCodes     int                             `json:"lineOfCodes,omitempty" bson:"lineOfCodes,omitempty"`
 }
 
 func main() {
@@ -58,8 +60,12 @@ func decodeContent(_ context.Context, i interface{}) (interface{}, error) {
 	return s, nil
 }
 
+
+
 func detectImplementationSmells(_ context.Context, i interface{}) (interface{}, error) {
 	s := i.(sample.Sample)
+	lineOfCodes := countLineOfCodes(s.Content)
+	fmt.Printf("Repository Id: %v\nLine of Codes: %v\n\n", s.RepositoryId, lineOfCodes)
 	detectionResult, err := smells_detector.Detect(s.Content)
 	if err != nil {
 		return nil, err
@@ -69,7 +75,12 @@ func detectImplementationSmells(_ context.Context, i interface{}) (interface{}, 
 		Path:            s.Path,
 		RepositoryId:    s.RepositoryId,
 		DetectionResult: detectionResult,
+		LineOfCodes:     lineOfCodes,
 	}, nil
+}
+
+func countLineOfCodes(script string) int {
+	return len(strings.Split(script, "\n"))
 }
 
 func createMongoSource(ctx context.Context, client *mongo.Client, collectionName string) rxgo.Observable {
@@ -113,6 +124,7 @@ func createMongoSink(client *mongo.Client, collectionName string) rxgo.Func {
 		}
 		update := bson.D{
 			{"$set", bson.D{{"detectionResult", s.DetectionResult}}},
+			{"$set", bson.D{{"lineOfCodes", s.LineOfCodes}}},
 		}
 		var updatedDocument bson.M
 		err := collection.FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedDocument)
