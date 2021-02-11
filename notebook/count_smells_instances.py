@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
 from collections import defaultdict
+from util import abbreviate
 
 client = MongoClient('localhost', 27017)
 
@@ -21,12 +22,6 @@ totalLoC = sum(map(
 print(totalLoC)
 
 smells = detection_results[0].keys()
-
-
-def abbreviate(s: str) -> str:
-    words = s.split('-')
-    return ''.join(map(lambda x: x[0].upper(), words))
-
 
 occurrences = defaultdict()
 
