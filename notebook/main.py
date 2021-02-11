@@ -1,12 +1,11 @@
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 client = MongoClient('localhost', 27017)
 
 db = client['kubernetes']
-
 detections = db['detections']
-
 detection_results = list(
     map(
         lambda x: x['detectionResult'],
@@ -14,13 +13,28 @@ detection_results = list(
     )
 )
 
+totalLoC = sum(map(
+    lambda x: x['lineOfCodes'],
+    list(detections.find())
+))
+
+print(totalLoC)
+
 smells = detection_results[0].keys()
 
-occurrences = {}
+
+def abbreviate(s: str) -> str:
+    words = s.split('-')
+    return ''.join(map(lambda x: x[0].upper(), words))
+
+
+occurrences = defaultdict()
 
 for smell in smells:
-    count = len(list(filter(lambda x: x[smell] is True, detection_results)))
-    occurrences[smell] = count
+    count = sum(map(lambda x: x[smell], detection_results))
+    occurrences[abbreviate(smell)] = count
+
+print(occurrences)
 
 x_pos = [i for i, _ in enumerate(occurrences.keys())]
 

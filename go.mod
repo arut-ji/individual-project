@@ -16,6 +16,7 @@ require (
 	go.mongodb.org/mongo-driver v1.4.4
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
+	golang.org/x/tools v0.0.0-20191108193012-7d206e10da11
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 	sigs.k8s.io/yaml v1.1.0
