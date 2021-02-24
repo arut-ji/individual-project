@@ -1,14 +1,11 @@
 from pymongo import MongoClient
 from collections import defaultdict
-from util import abbreviate
+from util import abbreviate, load_detections
 import matplotlib.pyplot as plt
 
 
 def main():
-    client = MongoClient('localhost', 27017)
-
-    db = client['kubernetes']
-    detections = db['detections']
+    detections = load_detections()
     detection_results = list(
         map(
             lambda x: x['detectionResult'],
