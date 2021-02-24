@@ -16,11 +16,12 @@ import (
 )
 
 type DetectionRecord struct {
-	FileName        string                          `json:"fileName,omitempty" bson:"fileName,omitempty"`
-	Path            string                          `json:"path,omitempty" bson:"path,omitempty"`
-	RepositoryId    int64                           `json:"repositoryId,omitempty" bson:"repositoryId,omitempty"`
-	DetectionResult smells_detector.DetectionResult `json:"detectionResult,omitempty" bson:"detectionResult, omitempty"`
-	LineOfCodes     int                             `json:"lineOfCodes,omitempty" bson:"lineOfCodes,omitempty"`
+	FileName          string                          `json:"fileName,omitempty" bson:"fileName,omitempty"`
+	Path              string                          `json:"path,omitempty" bson:"path,omitempty"`
+	RepositoryId      int64                           `json:"repositoryId,omitempty" bson:"repositoryId,omitempty"`
+	DetectionResult   smells_detector.DetectionResult `json:"detectionResult,omitempty" bson:"detectionResult, omitempty"`
+	LineOfCodes       int                             `json:"lineOfCodes,omitempty" bson:"lineOfCodes,omitempty"`
+	NumberOfResources int                             `json:"numberOfResources,omitempty" bson:"numberOfResources,omitempty"`
 }
 
 func main() {
@@ -60,22 +61,22 @@ func decodeContent(_ context.Context, i interface{}) (interface{}, error) {
 	return s, nil
 }
 
-
-
 func detectImplementationSmells(_ context.Context, i interface{}) (interface{}, error) {
 	s := i.(sample.Sample)
 	lineOfCodes := countLineOfCodes(s.Content)
-	fmt.Printf("Repository Id: %v\nLine of Codes: %v\n\n", s.RepositoryId, lineOfCodes)
+	numberOfResources := util.GetNumberOfResources(s.Content)
+	fmt.Printf("Repository Id: %v\nLine of Codes: %v\nNumber of resources: %v\n\n", s.RepositoryId, lineOfCodes, numberOfResources)
 	detectionResult, err := smells_detector.Detect(s.Content)
 	if err != nil {
 		return nil, err
 	}
 	return DetectionRecord{
-		FileName:        s.FileName,
-		Path:            s.Path,
-		RepositoryId:    s.RepositoryId,
-		DetectionResult: detectionResult,
-		LineOfCodes:     lineOfCodes,
+		FileName:          s.FileName,
+		Path:              s.Path,
+		RepositoryId:      s.RepositoryId,
+		DetectionResult:   detectionResult,
+		LineOfCodes:       lineOfCodes,
+		NumberOfResources: numberOfResources,
 	}, nil
 }
 
@@ -125,6 +126,7 @@ func createMongoSink(client *mongo.Client, collectionName string) rxgo.Func {
 		update := bson.D{
 			{"$set", bson.D{{"detectionResult", s.DetectionResult}}},
 			{"$set", bson.D{{"lineOfCodes", s.LineOfCodes}}},
+			{"$set", bson.D{{"numberOfResources", s.NumberOfResources}}},
 		}
 		var updatedDocument bson.M
 		err := collection.FindOneAndUpdate(ctx, filter, update, opts).Decode(&updatedDocument)

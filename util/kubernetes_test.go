@@ -68,3 +68,21 @@ func TestGetLivenessProbe(t *testing.T) {
 		t.Error("Detection returned errors")
 	}
 }
+
+func loadFixture(name string) string {
+	return LoadFixture("./fixtures")(name)
+}
+
+func TestGetNumberOfResourcesForOneResource(t *testing.T) {
+	script := loadFixture("get_number_of_resources_test/one_resource.yaml")
+	if result := GetNumberOfResources(script); result != 1 {
+		t.Errorf("The result was incorrect, got: %v, want: %v.", result, 1)
+	}
+}
+
+func TestGetNumberOfResourcesForMultipleResources(t *testing.T) {
+	script := loadFixture("get_number_of_resources_test/two_resources.yaml")
+	if result := GetNumberOfResources(script); result != 2 {
+		t.Errorf("The result was incorrect, got: %v, want: %v.", result, 2)
+	}
+}
