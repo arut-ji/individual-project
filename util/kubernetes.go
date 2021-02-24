@@ -1,5 +1,10 @@
 package util
 
+import (
+	"regexp"
+	"strings"
+)
+
 func GetContainers(manifest interface{}) []interface{} {
 	var result []interface{}
 	switch manifest.(type) {
@@ -54,4 +59,16 @@ func GetLivenessProbe(container interface{}) map[string]interface{} {
 		return nil
 	}
 	return probe.(map[string]interface{})
+}
+
+func GetNumberOfResources(script string) int {
+	count := 1
+	lines := strings.Split(script, "\n")
+	for _, line := range lines {
+		match, _ := regexp.MatchString("---", line)
+		if match {
+			count += 1
+		}
+	}
+	return count
 }
