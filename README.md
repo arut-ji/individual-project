@@ -22,7 +22,7 @@ the number of smells instances found for each category are the following:
 | Missing Readiness Probe (MRP)                    | 3,128     | 286              |
 
 Total line-of-code: 525,948
-Total number of scripts: 842
+Total number of scripts: 872
 
 ## Occurence Visualization
 
