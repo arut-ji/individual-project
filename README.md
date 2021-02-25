@@ -31,3 +31,13 @@ Total number of scripts: 872
 ## Effected Scripts Visualization
 
 ![Effected Scripts Visualization](./assets/number-of-scripts-effected.png)
+
+## Scripts Characteristics Visualization
+
+The first subplot is a histogram representing the number of line-of-code for each script.
+The second subplot is a histogram showing the number of Kubernetes resources per script.
+![Scripts Characteristics Visualization](./assets/script_characteristics.png)
+
+## Distinct Smells per script Visualization
+
+![Distinct Smells per script Visualization](./assets/distinct_per_script.png)
