@@ -16,13 +16,15 @@ def main():
             data[abbreviate(key)].append(value)
 
     df = pd.DataFrame.from_dict(data)
-    corr = df.corr()
+    occurrences = df.loc[:, df.columns != 'LoC']
+    df['total-occurrences'] = occurrences.sum(axis=1)
 
-    # TODO: loc-smells-density plot
-    print(df.loc[:, df.columns != 'LoC'].head())
+    fig, ax = plt.subplots(1, 1)
+    df.plot.scatter('LoC', 'total-occurrences', ax=ax)
 
-    # sns.heatmap(corr, annot=True)
-    # plt.show()
+    ax.set_ylabel("Smells Existence per Script")
+
+    fig.show()
 
 
 if __name__ == '__main__':
