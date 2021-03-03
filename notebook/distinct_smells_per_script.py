@@ -1,25 +1,17 @@
-from util import load_detections
+from util import load_detections, load_detections_as_df
 import matplotlib.pyplot as plt
 
 
 def main():
-    detections_db = load_detections()
-    detection_results = list(
-        map(
-            lambda x: x['detectionResult'],
-            list(detections_db.find())
-        )
-    )
-    distinct_smells = list(
-        map(
-            lambda detection: len(list(filter(lambda x: x != 0, detection.values()))),
-            detection_results
-        )
-    )
-    plt.hist(distinct_smells, bins=8)
-    plt.title('Distinct Smells per script')
-    plt.ylabel('Frequency')
-    plt.xlabel('Number of Distinct Smells per script')
+    df = load_detections_as_df()
+    occurrences_df = df.loc[:, (df.columns != 'LoC') & (df.columns != 'RpS')]
+    distinct_smells_df = occurrences_df.apply(
+        lambda x: sum(list(map(lambda item: 0 if item == 0 else 1, x))),
+        axis=1,
+        result_type='expand'
+    ).value_counts()
+    print(distinct_smells_df.head())
+    distinct_smells_df.plot(kind='bar')
     plt.show()
 
 
