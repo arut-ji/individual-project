@@ -12,7 +12,7 @@ def main():
     df.plot.scatter('LoC', 'total-occurrences', ax=ax[0])
     df.plot.scatter('RpS', 'total-occurrences', ax=ax[1])
 
-    ax[0].set_xlabel('Smells Existence per Script')
+    ax[0].set_xlabel('Line-of-code per Script')
     ax[0].set_xscale('log')
     ax[0].set_yscale('log')
     ax[0].set_ylabel('Occurrences')
