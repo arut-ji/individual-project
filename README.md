@@ -43,6 +43,7 @@ The second subplot is a histogram showing the number of Kubernetes resources per
 ![Distinct Smells per script Visualization](./assets/distinct_per_script.png)
 
 ## Correlation Analysis
+
 From the result we perform further analyses. The relationship between smells occurrences and
 each characteristic is firstly focused.
 
@@ -52,6 +53,10 @@ As we can see from the left-hand side graph, it shows that there are no occurren
 code smells persisted for small-size scripts to some extent. Secondly, when we look at the occurrences-resource-count graph, a trend where occurrences of smells
 increases as the number of resources per script grows.
 
-Next, we are going to consider the correlation between each smell category. 
+Next, we are going to consider the correlation between each smell category.
 
 ![Correlation Between Smells Category](./assets/correlation-between-smells-category.png)
+
+# Smells Co-occurrence
+
+![Smells Co-occurrence](./assets/smells-co-occurrences.png)
