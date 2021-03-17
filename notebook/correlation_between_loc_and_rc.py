@@ -6,7 +6,8 @@ def main():
     df = load_detections_as_df()
     occurrences = df.loc[:, df.columns != 'LoC']
     df['total-occurrences'] = occurrences.sum(axis=1)
-
+    df = df.loc[:, df.columns != 'AC']
+    print(df.head())
     fig, ax = plt.subplots(1, 2, figsize=(15, 7), sharex=True)
     fig.suptitle('Correlation between Smell Occurrences versus LoC and Resource Count')
     df.plot.scatter('LoC', 'total-occurrences', ax=ax[0])
