@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from collections import defaultdict
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def abbreviate(s: str) -> str:
@@ -29,3 +30,8 @@ def load_detections_as_df() -> pd.DataFrame:
             data[abbreviate(key)].append(value)
 
     return pd.DataFrame.from_dict(data)
+
+
+def run_and_save(dir_path: str, filename: str, runnable):
+    runnable()
+    plt.savefig(dir_path + filename)
