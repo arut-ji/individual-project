@@ -28,7 +28,7 @@ Total number of scripts: 872
 
 ## Occurence Visualization
 
-![Occurence Visualization](./assets/smell-instance-count.png)
+![Occurence Visualization](./assets/smells-instance-count.png)
 
 ## Effected Scripts Visualization
 
