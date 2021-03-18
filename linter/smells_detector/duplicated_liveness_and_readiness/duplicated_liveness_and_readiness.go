@@ -20,7 +20,8 @@ func countSmellInstances(script string) (int, error) {
 		for _, container := range containers {
 			livenessProbe := util.GetLivenessProbe(container)
 			readinessProbe := util.GetReadinessProbe(container)
-			if reflect.DeepEqual(readinessProbe, livenessProbe) {
+			bothDefined := livenessProbe != nil && readinessProbe != nil
+			if bothDefined && reflect.DeepEqual(readinessProbe, livenessProbe) {
 				count += 1
 			}
 		}

@@ -7,14 +7,22 @@ sns.set_theme()
 
 
 def main():
+    run()
+    plt.show()
+
+
+def name() -> str:
+    return "correlation-between-categories"
+
+
+def run():
     df = load_detections_as_df()
     df = df.loc[:, (df.columns != 'LoC') & (df.columns != 'RpS')]
 
-    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
     fig.suptitle('Correlation between Smells Category')
-    plot_heatmap(ax[0], df)
-    plot_heatmap(ax[1], df.loc[:, df.columns != 'AC'])
-    plt.show()
+    plot_heatmap(ax, df)
+    return fig
 
 
 def plot_heatmap(ax, df):

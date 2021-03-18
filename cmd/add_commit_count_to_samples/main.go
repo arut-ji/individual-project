@@ -56,7 +56,6 @@ func mapWithCommitCount(ghc *github.Client) rxgo.Func {
 		if err := mergo.Merge(&s, patch); err != nil {
 			return nil, err
 		}
-
 		return s, nil
 	}
 }

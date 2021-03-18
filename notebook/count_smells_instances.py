@@ -5,6 +5,15 @@ from util import abbreviate
 
 
 def main():
+    run()
+    plt.show()
+
+
+def name() -> str:
+    return 'smells-instance-count'
+
+
+def run():
     client = MongoClient('localhost', 27017)
 
     db = client['kubernetes']
@@ -24,13 +33,14 @@ def main():
         count = sum(map(lambda x: x[smell], detection_results))
         occurrences[abbreviate(smell)] = count
 
-    x_pos = [i for i, _ in enumerate(occurrences.keys())]
+    fig, ax = plt.subplots(1, 1)
 
-    plt.bar(occurrences.keys(), occurrences.values())
-    plt.xlabel("Smell Category")
-    plt.ylabel("Occurrence")
-    plt.title("Occurrences for each code smells (n = {})".format(len(detection_results)))
-    plt.show()
+    ax.bar(occurrences.keys(), occurrences.values())
+    ax.set_xlabel("Smell Category")
+    ax.set_yscale('log')
+    ax.set_ylabel("Occurrence")
+    ax.set_title("Occurrences for each code smells (n = {})".format(len(detection_results)))
+    return fig
 
 
 if __name__ == '__main__':

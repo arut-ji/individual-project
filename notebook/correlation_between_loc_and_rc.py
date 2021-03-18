@@ -3,6 +3,15 @@ from util import load_detections_as_df
 
 
 def main():
+    run()
+    plt.show()
+
+
+def name() -> str:
+    return "correlation-between-loc-and-rc"
+
+
+def run():
     df = load_detections_as_df()
     occurrences = df.loc[:, df.columns != 'LoC']
     df['total-occurrences'] = occurrences.sum(axis=1)
@@ -22,8 +31,7 @@ def main():
     ax[1].set_xscale('log')
     ax[1].set_yscale('log')
     ax[1].set_ylabel('Occurrences')
-
-    plt.show()
+    return fig
 
 
 if __name__ == '__main__':
