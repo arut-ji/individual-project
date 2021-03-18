@@ -2,15 +2,22 @@ import matplotlib.pyplot as plt
 from util import load_detections_as_df
 import seaborn as sns
 
-sns.set_theme()
+
+def name() -> str:
+    return 'smells-co-occurrence'
 
 
-def main():
+def run():
+    sns.set_theme()
     df = load_detections_as_df()
     df = df.loc[:, (df.columns != 'LoC') & (df.columns != 'RpS')]
     pg = sns.pairplot(df, kind="scatter", diag_kind="kde")
     pg.set(xscale="log")
     pg.tight_layout()
+
+
+def main():
+    run()
     plt.show()
 
 

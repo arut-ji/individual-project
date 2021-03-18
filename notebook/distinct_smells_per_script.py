@@ -1,8 +1,12 @@
-from util import load_detections, load_detections_as_df
+from util import load_detections_as_df
 import matplotlib.pyplot as plt
 
 
-def main():
+def name() -> str:
+    return 'distinct-smells-per-scripts'
+
+
+def run():
     df = load_detections_as_df()
     occurrences_df = df.loc[:, (df.columns != 'LoC') & (df.columns != 'RpS')]
     distinct_smells_df = occurrences_df.apply(
@@ -15,6 +19,11 @@ def main():
     ax.set_xlabel('Number of distinct smells')
     ax.set_ylabel('Frequency')
     ax.set_title('Distinct smells count in each script')
+    return fig
+
+
+def main():
+    run()
     plt.show()
 
 
