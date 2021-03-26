@@ -12,15 +12,13 @@ the number of smells instances found for each category are the following:
 - Duplicated Liveness and Readiness Probes (DLARP)
 - Missing Readiness Probe (MRP)
 
-<!-- TODO: Fix these numbers -->
-
 | Smell Category                                   | Instances [outdated] | Scripts Effected [outdated] |
 | ------------------------------------------------ | -------------------- | --------------------------- |
 | Incomplete Tasks (ICT)                           | 5                    | 5                           |
 | Long Statements (LS)                             | 3,255                | 217                         |
 | Avoid Comments (AC)                              | 18,530               | 389                         |
 | Improper Alignment (IA)                          | 540                  | 540                         |
-| Duplicated Liveness and Readiness Probes (DLARP) | 3,096                | 285                         |
+| Duplicated Liveness and Readiness Probes (DLARP) | 2                    | 2                           |
 | Missing Readiness Probe (MRP)                    | 3,128                | 286                         |
 
 Total line-of-code: 525,948

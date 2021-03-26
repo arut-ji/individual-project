@@ -34,7 +34,7 @@ def run():
         occurrences[abbreviate(smell)] = count
 
     fig, ax = plt.subplots(1, 1)
-
+    print(occurrences)
     ax.bar(occurrences.keys(), occurrences.values())
     ax.set_xlabel("Smell Category")
     ax.set_yscale('log')

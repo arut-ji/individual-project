@@ -150,10 +150,9 @@ The smells will be listed along with their portability and justification. The so
 
 ## Kubernetes Specific Smells
 
-After porting the existing smells found in the existing studies, the smells scoped to only Kubernetes are put in concern. By searching through what documented on the best practices about writing Kubernetes manifests, a specific set of patterns can be found, those are:
+Next, this section attempts to define a set of smells scoped to Kubernetes to answer the research question 2. By searching through guidelines and best practices documented about writing Kubernetes manifests, There are numerous aspects found. However, due to the time constraint, there only 4 of them extracted as code smells.
 
-Next, this section attempts to define a set of smells scoped to Kubernetes to answer the research question 2. By searching through guidelines and best practices documented about writing Kubernetes manifests, There are numerous aspects found. They are then selected to be described in code smells.
-
+The first conern selected is that resources relating to container specification should provide a readiness probe. To elaborate, the purpose of readiness probe is to supply a communiation channel between the container being created, and kubelet — the cluster activity controller, to tell if the container is ready for receving traffic.
 Smells
 
 - Missing Readiness Probes,

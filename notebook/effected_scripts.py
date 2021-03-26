@@ -27,13 +27,14 @@ def run():
     ax.bar(effected_scripts.keys(), effected_scripts.values())
     ax.set_xlabel("Smell Category")
     ax.set_ylabel("Number of effected scripts")
+    ax.set_yscale("log")
     ax.set_title("Number of scripts effected by each smell (n = {})".format(len(detection_results)))
     return fig
 
 
 def main():
     run()
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':
