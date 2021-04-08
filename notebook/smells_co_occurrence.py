@@ -14,6 +14,7 @@ def run():
     pg = sns.pairplot(df, kind="scatter", diag_kind="kde")
     pg.set(xscale="log")
     pg.tight_layout()
+    return pg.fig
 
 
 def main():

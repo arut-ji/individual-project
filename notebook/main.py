@@ -5,16 +5,20 @@ import distinct_smells_per_script as dsps
 import effected_scripts as es
 import scripts_characteristics as sc
 import smells_co_occurrence as sco
-import matplotlib.pyplot as plt
 
 
 def main():
     analyses = [cbc, cblac, csi, dsps, es, sc, sco]
+    dir_path = '../assets/'
     for analysis in analyses:
-        analysis.run()
-        dir_path = '../assets/'
-        filename = analysis.name() + ".png"
-        plt.savefig(dir_path + filename)
+        figs = analysis.run()
+        if isinstance(figs, list):
+            for i in range(len(figs)):
+                filename = dir_path + '{}-{}.png'.format(analysis.name(), i)
+                figs[i].savefig(filename)
+        else:
+            filename = analysis.name() + '.png'
+            figs.savefig(dir_path + filename)
 
 
 if __name__ == '__main__':

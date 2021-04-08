@@ -1,8 +1,6 @@
 from pymongo import MongoClient
 from collections import defaultdict
 import pandas as pd
-import matplotlib.pyplot as plt
-
 
 def abbreviate(s: str) -> str:
     words = s.split('-')
